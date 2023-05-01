@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.60.0/phaser.js" integrity="sha512-H05oT7BAjM9Ai1IaFX9zr61NtE2e1P0MkTz3AZXBnseaJSAOt2FGMFJ+vVGutaJxEGA1jxUiYsTBYQNE08/Erw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+        class Intro extends Phaser.scene{
+            constructor(){
+                super('intro)');
+            }
+
+            preload(){
+                this.load.image('logo', 'assets/logo.png');
+             }
+        }
+
+        class Body extends Phaser.scene{
+            constructor(){
+                super('body');
+            }
+
+            create(){
+                this.add.text(610, 450, "Click to continue...")
+                this.add.tween({
+                    targets: text,
+                    alpha: 0,
+                    duration: 1000,
+                    ease: 'Power2'
+                });
+                this.input.on('pointerdown', () => this.scene.start('intro'));
+            }
+        }
+    </script>
+</head>
+<body>
+    
+</body>
+</html>
