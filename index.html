@@ -26,7 +26,7 @@
 
                 this.time.delayedCall(1500, () => {
                     logo.visible = true;
-                    this.add.tween({
+                    this.tweens.add({
                         targets: logo,
                         scale: {from: 0, to: 1},
                         duration: 500,
@@ -34,7 +34,7 @@
                     });
                 });
 
-                this.input.on('pointdown', () => {
+                this.input.on('pointerdown', () => {
                     this.cameras.main.fadeOut(1500);
                     this.scene.start('body');
                 });
@@ -50,21 +50,59 @@
                 // camera fades in 1s, shows loadup scene
                 this.cameras.main.fadeIn(1000)
 
-                this.add.text(610, 450, "Click to continue...")
-                this.add.tween({
-                    targets: text,
-                    alpha: 0,
-                    duration: 1000,
-                    ease: 'Power2'
+                let text = this.add.text(this.game.config.width - 20, this.game.config.height - 20, "Click to continue...");
+                text.setOrigin(1, 1);
+
+                this.input.on('pointerdown', () => {
+                    this.cameras.main.fadeOut(1000);
+                    this.scene.start('loadup');
+                    this.tweens.add({
+                        targets: text,
+                        alpha: 0,
+                        duration: 1000,
+                        ease: 'Power2'
                 });
-                this.input.on('pointerdown', () => this.scene.start('intro'));
+                });
             }
         }
 
+        class Loadup extends Phaser.Scene{
+            constructor(){
+                super('loadup');
+            }
+
+            create(){
+                this.cameras.main.fadeIn(1000)
+
+                let text = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, "Loading...")
+                text.setOrigin(0.5);
+
+                this.tweens.add({
+                    targets: text,
+                    alpha: 0,
+                    duration: 5000,
+                    ease: 'Power2'
+                });
+
+                this.input.on('pointerdown', () => {
+                    this.cameras.main.fadeOut(1500);
+                    this.tweens.add({
+                        targets: text,
+                        alpha: 0,
+                        duration: 1500,
+                        ease: 'Power2'
+                    });
+                    this.cameras.main.once('camerafadeoutcomplete', () => {
+                        this.scene.start('intro');
+                        this.cameras.main.fadeIn(1500);
+                    });
+            });
+        }
+    }
         new Phaser.Game({
             width: 640,
             height: 480,
-            scene: [Intro, Body],
+            scene: [Intro, Body, Loadup],
         });
     </script>
 </head>
