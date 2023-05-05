@@ -13,23 +13,32 @@
                 super('intro');
             }
 
-            // preload(){
-            //     let logo = this.load.image('logo', 'assets/logo.png');
-            // }
+            preload(){
+                this.load.image('logo', 'assets/logo.png');
+            }
 
             create() {
                 // camera fades in 1.5s, logo fades in 1s, scales .5s, on left click, fade out 1.5s, start body scene
                 // placeholder circle for logo
-                let logo = this.add.circle(320, 240, 100, 0xff0000);
+                const logo = this.add.image(this.scale.width/2, this.scale.height/2, 'logo');
+                logo.setOrigin(0.5);
+                logo.setInteractive();
                 logo.visible = false;
+
                 this.cameras.main.fadeIn(1500)
 
                 this.time.delayedCall(1500, () => {
                     logo.visible = true;
                     this.tweens.add({
                         targets: logo,
-                        scale: {from: 0, to: 1},
+                        scale: {from: 0, to: .25},
                         duration: 500,
+                        ease: 'Power2'
+                    });
+                    this.tweens.add({
+                        targets: logo,
+                        alpha: {from: 0, to: 1},
+                        duration: 1000,
                         ease: 'Power2'
                     });
                 });
@@ -100,9 +109,18 @@
         }
     }
         new Phaser.Game({
-            width: 640,
-            height: 480,
+            type: Phaser.AUTO,
+            width: 800,
+            height: 600,
+            backgroundColor:"556b2f",
             scene: [Intro, Body, Loadup],
+            physics: {
+                default: 'arcade',
+                arcade: {
+                    gravity: {y: 300},
+                    debug: false
+                }
+            }
         });
     </script>
 </head>
