@@ -1,28 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Phaser Cinematic by Jentsen Maniti</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.60.0/phaser.js" integrity="sha512-H05oT7BAjM9Ai1IaFX9zr61NtE2e1P0MkTz3AZXBnseaJSAOt2FGMFJ+vVGutaJxEGA1jxUiYsTBYQNE08/Erw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/phaser/3.60.0/phaser.js"
+        integrity="sha512-H05oT7BAjM9Ai1IaFX9zr61NtE2e1P0MkTz3AZXBnseaJSAOt2FGMFJ+vVGutaJxEGA1jxUiYsTBYQNE08/Erw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
-        
-        class Intro extends Phaser.Scene{
+
+        class Intro extends Phaser.Scene {
             constructor() {
                 super('intro');
             }
 
-            preload(){
+            preload() {
                 this.load.image('logo', 'assets/logo.png');
             }
 
             create() {
                 // camera fades in 1.5s, logo fades in 1s, scales .5s, on left click, fade out 1.5s, start body scene
-                // placeholder circle for logo
-                const logo = this.add.image(this.scale.width/2, this.scale.height/2, 'logo');
+                const logo = this.add.image(this.scale.width / 2, this.scale.height / 2, 'logo');
+
                 logo.setOrigin(0.5);
-                logo.setInteractive();
+                // logo.setInteractive();
                 logo.visible = false;
 
                 this.cameras.main.fadeIn(1500)
@@ -31,13 +34,13 @@
                     logo.visible = true;
                     this.tweens.add({
                         targets: logo,
-                        scale: {from: 0, to: .25},
+                        scale: { from: 0, to: .25 },
                         duration: 500,
-                        ease: 'Power2'
+                        ease: 'power2'
                     });
                     this.tweens.add({
                         targets: logo,
-                        alpha: {from: 0, to: 1},
+                        alpha: { from: 0, to: 1 },
                         duration: 1000,
                         ease: 'Power2'
                     });
@@ -50,7 +53,7 @@
             }
         }
 
-        class Body extends Phaser.Scene{
+        class Body extends Phaser.Scene {
             constructor() {
                 super('body');
             }
@@ -70,33 +73,44 @@
                         alpha: 0,
                         duration: 1000,
                         ease: 'Power2'
-                });
+                    });
                 });
             }
         }
 
-        class Loadup extends Phaser.Scene{
-            constructor(){
+        class Loadup extends Phaser.Scene {
+            constructor() {
                 super('loadup');
             }
 
-            create(){
+            create() {
                 this.cameras.main.fadeIn(1000)
 
-                let text = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, "Loading...")
-                text.setOrigin(0.5);
+                let loading = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, "Loading...")
+                loading.setOrigin(0.5);
 
                 this.tweens.add({
-                    targets: text,
+                    targets: loading,
                     alpha: 0,
-                    duration: 5000,
+                    duration: 3000,
                     ease: 'Power2'
+                });
+                
+                this.time.delayedCall(3000, () => {
+                    let click = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, "Click to continue")
+                    click.setOrigin(0.5);
+                    this.tweens.add({
+                        targets: click,
+                        alpha: 1,
+                        duration: 3000,
+                        easeIn: 'Power2'
+                    });
                 });
 
                 this.input.on('pointerdown', () => {
                     this.cameras.main.fadeOut(1500);
                     this.tweens.add({
-                        targets: text,
+                        targets: loading,
                         alpha: 0,
                         duration: 1500,
                         ease: 'Power2'
@@ -105,26 +119,29 @@
                         this.scene.start('intro');
                         this.cameras.main.fadeIn(1500);
                     });
-            });
+                });
+            }
         }
-    }
+
         new Phaser.Game({
             type: Phaser.AUTO,
             width: 800,
             height: 600,
-            backgroundColor:"556b2f",
+            backgroundColor: "556b2f",
             scene: [Intro, Body, Loadup],
             physics: {
                 default: 'arcade',
                 arcade: {
-                    gravity: {y: 300},
+                    gravity: { y: 300 },
                     debug: false
                 }
             }
         });
     </script>
 </head>
+
 <body>
-    
+
 </body>
+
 </html>
