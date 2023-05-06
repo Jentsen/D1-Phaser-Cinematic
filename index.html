@@ -175,14 +175,12 @@
             }
 
             create() {
-                // camera fades in 1.5s, logo fades in 1s, scales .5s, on left click, fade out 1.5s, start loading scene
+
                 const main = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'main');
                 main.setOrigin(0.5);
-                // logo.setInteractive();
-                logo.visible = false;
 
                 this.time.delayedCall(1000, () => {
-                    this.sound.play('intro');
+                    this.sound.play('main', { loop: true, volume: 0.1 });
                 });
 
                 this.cameras.main.fadeIn(1000)
@@ -191,33 +189,21 @@
                     `Play
 Options
 Credits
-Quit`, { fill: "black" });
+Quit`, { font: '25px', fill: "white" });
                 box.setWordWrapWidth(250);
-                let triangle = this.add.triangle(box.width - 30, box.y + 7, 0, 0, 20, 10, 0, 20, 0x000000);
+                let triangle = this.add.triangle(box.width - 70, box.y + 7, 0, 0, 20, 10, 0, 20, 0x000000);
 
-                let loading = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, "Loading...", { fill: "black" })
-                loading.setOrigin(0.5);
-
-                this.tweens.add({
-                    targets: loading,
-                    alpha: 0,
-                    duration: 3000,
-                    ease: 'Power2'
-                });
+                let title = this.add.text(this.cameras.main.centerX+25, this.cameras.main.centerY + 250, "Through Another Lens", { font: '40px', fill: "black" })
+                title.setOrigin(0.5);
 
                 this.input.on('pointerdown', () => {
                     this.cameras.main.fadeOut(1500);
-                    this.tweens.add({
-                        targets: loading,
-                        alpha: 0,
-                        duration: 1500,
-                        ease: 'Power2'
+                    this.sound.stopAll();
                     });
                     this.cameras.main.once('camerafadeoutcomplete', () => {
                         this.scene.start('intro');
                         this.cameras.main.fadeIn(1500);
                     });
-                });
             }
         }
 
