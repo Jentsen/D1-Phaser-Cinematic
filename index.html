@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -9,34 +10,73 @@
         integrity="sha512-H05oT7BAjM9Ai1IaFX9zr61NtE2e1P0MkTz3AZXBnseaJSAOt2FGMFJ+vVGutaJxEGA1jxUiYsTBYQNE08/Erw=="
         crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
-
         class Intro extends Phaser.Scene {
             constructor() {
                 super('intro');
             }
 
+            create() {
+                let text = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, "Click to start!",
+                    { font: "25px", fill: "white" });
+                text.setOrigin(0.5);
+
+                this.input.on('pointerdown', () => {
+                    this.cameras.main.fadeOut(1500);
+                    this.scene.start('logo');
+                });
+            }
+        }
+
+        class Logo extends Phaser.Scene {
+            constructor() {
+                super('logo');
+            }
+
             preload() {
                 this.load.image('logo', 'assets/logo.png');
+                this.load.audio('intro', 'assets/intro.mp3');
             }
 
             create() {
                 // camera fades in 1.5s, logo fades in 1s, scales .5s, on left click, fade out 1.5s, start body scene
                 const logo = this.add.image(this.scale.width / 2, this.scale.height / 2, 'logo');
-
                 logo.setOrigin(0.5);
                 // logo.setInteractive();
                 logo.visible = false;
 
-                this.cameras.main.fadeIn(1500)
+                this.time.delayedCall(1000, () => {
+                    this.sound.play('intro');
+                });
 
-                this.time.delayedCall(1500, () => {
+                this.cameras.main.fadeIn(1500);
+
+                this.time.delayedCall(1000, () => {
                     logo.visible = true;
                     this.tweens.add({
                         targets: logo,
                         scale: { from: 0, to: .25 },
-                        duration: 500,
+                        duration: 2750,
                         ease: 'power2'
                     });
+
+                    // logo pulses and shakes
+                    this.time.delayedCall(2750, () => {
+                        this.tweens.add({
+                            targets: logo,
+                            scale: { from: .25, to: .3 },
+                            duration: 50,
+                            easeOut: 'power2',
+                            yoyo: true,
+                        })
+                        this.tweens.add({
+                            targets: logo,
+                            angle: { from: 0, to: 5 },
+                            duration: 50,
+                            easeIn: 'power2',
+                            yoyo: true,
+                        })
+                    });
+
                     this.tweens.add({
                         targets: logo,
                         alpha: { from: 0, to: 1 },
@@ -56,10 +96,12 @@
             constructor() {
                 super('body');
             }
-
+            preload() {
+                this.load.video('loading', 'assets/loading.mp4', 'loadeddata', false, true);
+            }
             create() {
-                // camera fades in 1s, shows loadup scene
-                this.cameras.main.fadeIn(1000)
+                // camera fades in 1.5s, shows loadup scene
+                this.cameras.main.fadeIn(1500)
 
                 let text = this.add.text(this.game.config.width - 20, this.game.config.height - 20, "Click to continue...");
                 text.setOrigin(1, 1);
@@ -94,7 +136,7 @@
                     duration: 3000,
                     ease: 'Power2'
                 });
-                
+
                 this.time.delayedCall(3000, () => {
                     let click = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, "Click to continue")
                     click.setOrigin(0.5);
@@ -127,7 +169,7 @@
             width: 800,
             height: 600,
             backgroundColor: "556b2f",
-            scene: [Intro, Body, Loadup],
+            scene: [Intro, Logo, Body, Loadup],
             physics: {
                 default: 'arcade',
                 arcade: {
@@ -138,7 +180,9 @@
         });
     </script>
 </head>
+
 <body>
 
 </body>
+
 </html>
