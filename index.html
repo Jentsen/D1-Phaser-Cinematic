@@ -17,11 +17,11 @@
 
             create() {
                 let text = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, "Click to start!",
-                    { font: "25px", fill: "white" });
+                    { font: "25px", fill: "black" });
                 text.setOrigin(0.5);
 
                 this.input.on('pointerdown', () => {
-                    this.cameras.main.fadeOut(1500);
+                    this.cameras.main.fadeOut(2000);
                     this.scene.start('logo');
                 });
             }
@@ -38,7 +38,7 @@
             }
 
             create() {
-                // camera fades in 1.5s, logo fades in 1s, scales .5s, on left click, fade out 1.5s, start body scene
+                // camera fades in 1.5s, logo fades in 1s, scales .5s, on left click, fade out 1.5s, start loading scene
                 const logo = this.add.image(this.scale.width / 2, this.scale.height / 2, 'logo');
                 logo.setOrigin(0.5);
                 // logo.setInteractive();
@@ -85,30 +85,75 @@
                     });
                 });
 
+                // change scenes if 6 seconds pass
+                this.time.delayedCall(6000, () => {
+                    this.cameras.main.fadeOut(1500);
+                    this.scene.start('loading');
+                });
+
+                // change scenes if clicked down
                 this.input.on('pointerdown', () => {
                     this.cameras.main.fadeOut(1500);
-                    this.scene.start('body');
+                    this.scene.start('loading');
                 });
             }
         }
 
-        class Body extends Phaser.Scene {
+        class Loading extends Phaser.Scene {
             constructor() {
-                super('body');
+                super('loading');
             }
             preload() {
-                this.load.video('loading', 'assets/loading.mp4', 'loadeddata', false, true);
+                this.load.video('loading', 'assets/loading.mp4', { loop: true, mute: true });
+                this.load.path = 'assets/';
             }
             create() {
-                // camera fades in 1.5s, shows loadup scene
+                // camera fades in 1.5s, shows main scene
                 this.cameras.main.fadeIn(1500)
+                //Display the looping loading.mp4
+                const loading = this.add.video(this.cameras.main.centerX, this.cameras.main.centerY, 'loading');
+                loading.setOrigin(0.5);
+                loading.play(true);
 
-                let text = this.add.text(this.game.config.width - 20, this.game.config.height - 20, "Click to continue...");
-                text.setOrigin(1, 1);
+                // Display the text Loading... in the middle of the screen
+                let load = this.add.text(this.game.config.width - 325, this.game.config.height - 20, "Loading...", { fill: "black" })
+                load.setOrigin(0.5);
+                this.time.delayedCall(3000, () => {
+                    this.tweens.add({
+                        targets: load,
+                        alpha: 0,
+                        duration: 5000,
+                        ease: 'Power2'
+                    });
+                });
+
+                // Add a rectangle to the scene
+                const rectWidth = 50;
+                const rectHeight = 20;
+                const rect = this.add.rectangle(this.game.config.width - 250, this.game.config.height - 20, rectWidth, rectHeight, 0xffffff);
+                rect.setOrigin(0.5);
+
+                // Tween the rectangle to fill up over 5 seconds
+                this.tweens.add({
+                    targets: rect,
+                    width: 250,
+                    duration: 5000,
+                    ease: 'Linear'
+                });
+                this.time.delayedCall(5000, () => {
+                    let click = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, "Click to continue.", { fill: "black" })
+                    click.setOrigin(0.5);
+                    this.tweens.add({
+                        targets: click,
+                        alpha: 1,
+                        duration: 3000,
+                        easeIn: 'Power2'
+                    });
+                });
 
                 this.input.on('pointerdown', () => {
                     this.cameras.main.fadeOut(1000);
-                    this.scene.start('loadup');
+                    this.scene.start('main');
                     this.tweens.add({
                         targets: text,
                         alpha: 0,
@@ -119,15 +164,38 @@
             }
         }
 
-        class Loadup extends Phaser.Scene {
+        class Main extends Phaser.Scene {
             constructor() {
-                super('loadup');
+                super('main');
+            }
+
+            preload() {
+                this.load.image('main', 'assets/main.png')
+                this.load.audio('main', 'assets/main.mp3');
             }
 
             create() {
+                // camera fades in 1.5s, logo fades in 1s, scales .5s, on left click, fade out 1.5s, start loading scene
+                const main = this.add.image(this.cameras.main.centerX, this.cameras.main.centerY, 'main');
+                main.setOrigin(0.5);
+                // logo.setInteractive();
+                logo.visible = false;
+
+                this.time.delayedCall(1000, () => {
+                    this.sound.play('intro');
+                });
+
                 this.cameras.main.fadeIn(1000)
 
-                let loading = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, "Loading...")
+                let box = this.add.text(50, 100,
+                    `Play
+Options
+Credits
+Quit`, { fill: "black" });
+                box.setWordWrapWidth(250);
+                let triangle = this.add.triangle(box.width - 30, box.y + 7, 0, 0, 20, 10, 0, 20, 0x000000);
+
+                let loading = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, "Loading...", { fill: "black" })
                 loading.setOrigin(0.5);
 
                 this.tweens.add({
@@ -135,17 +203,6 @@
                     alpha: 0,
                     duration: 3000,
                     ease: 'Power2'
-                });
-
-                this.time.delayedCall(3000, () => {
-                    let click = this.add.text(this.cameras.main.centerX, this.cameras.main.centerY, "Click to continue")
-                    click.setOrigin(0.5);
-                    this.tweens.add({
-                        targets: click,
-                        alpha: 1,
-                        duration: 3000,
-                        easeIn: 'Power2'
-                    });
                 });
 
                 this.input.on('pointerdown', () => {
@@ -168,8 +225,8 @@
             type: Phaser.AUTO,
             width: 800,
             height: 600,
-            backgroundColor: "556b2f",
-            scene: [Intro, Logo, Body, Loadup],
+            backgroundColor: "F8F0E3",
+            scene: [Intro, Logo, Loading, Main],
             physics: {
                 default: 'arcade',
                 arcade: {
